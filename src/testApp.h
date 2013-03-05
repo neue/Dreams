@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxXmlSettings.h"
 
-#define NUM_PTS 800
+#define NUM_PTS 10000
 
 class testApp : public ofBaseApp{
 
@@ -30,18 +30,30 @@ class testApp : public ofBaseApp{
 		string message;
 
 		ofPoint dragPts[NUM_PTS];
+    
+    
+        struct rhonPoint {
+            ofPoint pnt;
+            rhonPoint(const float x, float y, float z){
+                pnt.set(x,y,z);
+            }
+
+        };
+
+        struct rhonLine {
+            vector<rhonPoint> rhonPoints;
+        };
+
+    
+        vector<rhonLine*> rhonLines;
 
 		int pointCount;
 		int lineCount;
 		int lastTagNumber;
-
-		float red;
-		float green;
-		float blue;
     
-    float offsetX;
-    float offsetY;
-    float offsetZ;
+        float offsetX;
+        float offsetY;
+        float offsetZ;
     
     ofEasyCam cam; // add mouse controls for camera movement
 

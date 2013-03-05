@@ -13,7 +13,7 @@ void testApp::setup(){
 	//we load our settings file
 	//if it doesn't exist we can still make one
 	//by hitting the 's' key
-	if( XML.loadFile("sketch.xml") ){
+	if( XML.loadFile("sketch2.xml") ){
 		message = "sketch.xml loaded!";
 	}else{
 		message = "unable to load sketch.xml check data/ folder";
@@ -37,44 +37,47 @@ void testApp::setup(){
 
 	//lets see how many <STROKE> </STROKE> tags there are in the xml file
 	int numDragTags = XML.getNumTags("line:pt");
+	int numLines = XML.getNumTags("line");
 
 	//if there is at least one <STROKE> tag we can read the list of points
 	//and then try and draw it as a line on the screen
-	if(numDragTags > 0){
+	if(numLines > 0){
 
 		//we push into the last STROKE tag
 		//this temporarirly treats the tag as
 		//the document root.
-		XML.pushTag("line", 3);
-//		XML.pushTag("line", numDragTags-1);
+        
+        for(int i = 0;i < numLines;i++){
+            rhonLine * newRhonLine = new rhonLine();
 
-			//we see how many points we have stored in <PT> tags
-			int numPtTags = XML.getNumTags("pt");
+        
+            XML.pushTag("line", i);
 
-			if(numPtTags > 0){
+                //we see how many points we have stored in <PT> tags
+                int numPtTags = XML.getNumTags("pt");
 
-				//We then read those x y values into our
-				//array - so that we can then draw the points as
-				//a line on the screen
+                if(numPtTags > 0){
+                    ofLog() << " Numpointtags:" << numPtTags;
 
-				//we have only allocated a certan amount of space for our array
-				//so we don't want to read more than that amount of points
-				int totalToRead = MIN(numPtTags, NUM_PTS);
+                    int totalToRead = MIN(numPtTags, NUM_PTS);
 
-				for(int i = 0; i < totalToRead; i++){
-					//the last argument of getValue can be used to specify
-					//which tag out of multiple tags you are refering to.
-					int x = XML.getValue("pt:x", 0, i);
-					int y = XML.getValue("pt:y", 0, i);
-					int z = XML.getValue("pt:z", 0, i);
-					dragPts[i].set(x, y,z);
-					pointCount++;
-				}
-			}
+                    for(int i2 = 0; i2 < numPtTags; i2++){
+                        int x = XML.getValue("pt:x", 0, i2);
+                        int y = XML.getValue("pt:y", 0, i2);
+                        int z = XML.getValue("pt:z", 0, i2);
+                        newRhonLine->rhonPoints.push_back(rhonPoint(x, y, z*-1));
+                        dragPts[i2].set(x, y,z);
+                        pointCount++;
+                    }
+                }
+            //this pops us out of the STROKE tag
+            //sets the root back to the xml document
+            XML.popTag();
+            rhonLines.push_back(newRhonLine);
 
-		//this pops us out of the STROKE tag
-		//sets the root back to the xml document
-		XML.popTag();
+        }
+        ofLog() << "Lines:" << rhonLines.size();
+
 	}
 
 	//load a monospaced font
@@ -95,13 +98,25 @@ void testApp::draw(){
 	//Lets draw the stroke as a continous line
 	ofSetColor(0,0,0);
 	ofNoFill();
-	ofBeginShape();
-	for(int i = 0; i < pointCount; i++){
-		ofVertex(dragPts[i].x+offsetX+ofRandom(-0.2,0.2),
-                 dragPts[i].y+offsetY+ofRandom(-0.2,0.2),
-                 dragPts[i].z+offsetZ+ofRandom(-0.2,0.2)
-                 );
-	}
+//	ofBeginShape();
+//	for(int i = 0; i < pointCount; i++){
+//		ofVertex(dragPts[i].x+offsetX+ofRandom(-0.2,0.2),
+//                 dragPts[i].y+offsetY+ofRandom(-0.2,0.2),
+//                 dragPts[i].z+offsetZ+ofRandom(-0.2,0.2)
+//                 );
+//	}
+//    ofEndShape(false);
+
+    for(int i = 0; i < rhonLines.size();i++){
+        ofBeginShape();
+        for(int i2=0;i2 < rhonLines[i]->rhonPoints.size();i2++){
+            ofVertex(rhonLines[i]->rhonPoints[i2].pnt.x+offsetX,
+                     rhonLines[i]->rhonPoints[i2].pnt.y+offsetY,
+                     rhonLines[i]->rhonPoints[i2].pnt.z+offsetZ
+                     );
+        }
+        ofEndShape(false);
+    }
 	ofEndShape(false);
     ofFill();
     cam.end();
