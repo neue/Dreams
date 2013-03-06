@@ -4,7 +4,7 @@
 #include "ofxXmlSettings.h"
 
 #define NUM_PTS 10000
-#define FOG_DIST 1000
+#define FOG_DIST 2000
 
 class testApp : public ofBaseApp{
 
@@ -15,7 +15,11 @@ class testApp : public ofBaseApp{
         void draw();
         void loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY, float anchorZ);
 		
+        void corrupt(int sketchToCorrupt);
+    
         void drawZeroPoint();
+        void drawCrosshair(float x,float y,float z,float size);
+    
         float measure(float x1,float y1,float x2,float y2);
     
 		void keyPressed(int key);
