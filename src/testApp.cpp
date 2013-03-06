@@ -1,11 +1,16 @@
 #include "testApp.h"
 
+#define WIDTH 1024
+#define HEIGHT 768
 
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0,0,0);
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
+    screenFbo.allocate(WIDTH, HEIGHT);
+    // looks in /bin/data
+    chrom_abb.load("shaders/chrom_abb.vert", "shaders/chrom_abb.frag");
 
 	//-----------
 	//the string is printed at the top of the app
@@ -97,6 +102,8 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
+    screenFbo.begin();
+	ofBackground(0,0,0);
 
 	cam.begin();
 
@@ -163,7 +170,22 @@ void testApp::draw(){
 
 	ofSetColor(0, 255, 0, 200);
     //TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 12);
-    
+    screenFbo.end();
+    chrom_abb.begin();
+    // Pass Fbo of screen to shader
+    chrom_abb.setUniformTexture("baseTex", screenFbo.getTextureReference(), 0);
+    // Give the shader a random x and y offset from -10 to 10
+    chrom_abb.setUniform2f("uAberrationOffset", -2, 0);
+    // Draw a quad using OpenGL
+    // This is where the result of the shader is outputted
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);     glVertex2f(0, 0);
+    glTexCoord2f(WIDTH, 0);     glVertex2f(WIDTH, 0);
+    glTexCoord2f(WIDTH, HEIGHT);    glVertex2f(WIDTH, HEIGHT);
+    glTexCoord2f(0, HEIGHT);    glVertex2f(0, HEIGHT);
+    glEnd();
+    chrom_abb.end();
+
 
 }
 

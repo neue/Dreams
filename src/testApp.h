@@ -79,7 +79,9 @@ class testApp : public ofBaseApp{
     float rotateX;
     float rotateY;
     float rotateZ;
-    
+    ofFbo screenFbo;
+    ofShader chrom_abb;
+
     
     
     float timeCode;
