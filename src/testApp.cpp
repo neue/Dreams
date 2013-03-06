@@ -78,10 +78,10 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
 void testApp::update(){
     //timeCode += 0.01;
     timeCode = ofGetLastFrameTime();
-    //offsetZ +=  timeCode * 200;
+    offsetZ +=  timeCode * 200;
     if(offsetZ > 2000){
         offsetZ = -2500;
-        //corrupt(visibleSketch);
+        corrupt(visibleSketch);
         visibleSketch = (visibleSketch+1)%rhonSketches.size();
         ofLog() << "Sketch:" << visibleSketch;
     }
