@@ -4,6 +4,8 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0,0,0);
+    ofSetFrameRate(60);
+    ofSetVerticalSync(true);
 
 	//-----------
 	//the string is printed at the top of the app
@@ -23,9 +25,15 @@ void testApp::setup(){
 	pointCount		= 0;
 	lineCount		= 0;
     
-     offsetX = 0.0;
-     offsetY = 0.0;
-     offsetZ = 0.0;
+    offsetX = 0.0;
+    offsetY = 0.0;
+    offsetZ = 0.0;
+    angle   = 0.0;
+    rotateX = 0.0;
+    rotateY = 0.0;
+    rotateZ = 0.0;
+    
+
 	TTF.loadFont("mono.ttf", 7);
     
     visibleSketch = 0;
@@ -51,7 +59,7 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
                     int x = sketchXML.getValue("pt:x", 0, i2);
                     int y = sketchXML.getValue("pt:y", 0, i2);
                     int z = sketchXML.getValue("pt:z", 0, i2);
-                    newRhonLine->rhonPoints.push_back(rhonPoint(x, y, z*-1));
+                    newRhonLine->rhonPoints.push_back(rhonPoint(x, y, z));
                     dragPts[i2].set(x, y,z);
                     pointCount++;
                 }
@@ -63,20 +71,28 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
 	}
     newRhonSketch->pos.set(anchorX,anchorY,anchorZ);
     rhonSketches.push_back(newRhonSketch);
-    offsetZ = 0;
+    offsetZ = 500;
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-    timeCode += 0.01;
-    offsetZ += 0.4;
+    //timeCode += 0.01;
+    timeCode = ofGetLastFrameTime();
+    //offsetZ +=  timeCode * 200;
     if(offsetZ > 2000){
         offsetZ = -2500;
-        corrupt(visibleSketch);
+        //corrupt(visibleSketch);
         visibleSketch = (visibleSketch+1)%rhonSketches.size();
         ofLog() << "Sketch:" << visibleSketch;
     }
     //ofLog() << "Z:" << offsetZ;
+    
+    angle   +=  timeCode * 70;
+    rotateX +=  timeCode * 100;
+    rotateY +=  timeCode * -80;
+    rotateZ +=  timeCode * 89;
+
+    
 }
 
 //--------------------------------------------------------------
@@ -104,7 +120,8 @@ void testApp::draw(){
     glTranslatef(offsetX, offsetY, offsetZ);
 
         glPushMatrix();
-        glRotatef(timeCode*5, timeCode* -3, timeCode*8, timeCode*7);
+        glRotatef(angle, rotateX, rotateY, rotateZ);
+    
 
         for(int i = 0; i < rhonSketches.size();i++){
         if(i== visibleSketch){
@@ -128,6 +145,8 @@ void testApp::draw(){
     
     //drawZeroPoint();
     
+    
+    
     drawCrosshair(-300,-300,0,30);
     drawCrosshair(-300,-300,-500,30);
     drawCrosshair(300,-300,-500,30);
@@ -142,8 +161,8 @@ void testApp::draw(){
     ofFill();
     cam.end();
 
-	ofSetColor(0, 0, 255, 200);
-    TTF.drawString("Distance: "+ofToString(sketchBrightness), 170, 12);
+	ofSetColor(0, 255, 0, 200);
+    //TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 12);
     
 
 }
@@ -169,17 +188,33 @@ void testApp::drawZeroPoint(){
 void testApp::drawCrosshair(float x, float y, float z,float size){
     ofSetColor(255,255,255);
     ofBeginShape();
-        ofVertex((size*-1)+x,0+y,0+z);
-        ofVertex(size+x,0+y,0+z);
+    ofVertex((size*-1)+x,0+y,0+z);
+    ofVertex(size+x,0+y,0+z);
     ofEndShape(false);
     ofBeginShape();
-        ofVertex(0+x,size+y,0+z);
-        ofVertex(0+x,(size*-1)+y,0+z);
+    ofVertex(0+x,size+y,0+z);
+    ofVertex(0+x,(size*-1)+y,0+z);
     ofEndShape(false);
     ofBeginShape();
-        ofVertex(0+x,0+y,(size*-1)+z);
-        ofVertex(0+x,0+y,size+z);
+    ofVertex(0+x,0+y,(size*-1)+z);
+    ofVertex(0+x,0+y,size+z);
     ofEndShape(false);
+}
+//--------------------------------------------------------------
+void testApp::drawGrid(float x, float y, float z){
+    for (int g1 = 0; g1 < MAX_GRID; g1++) {
+        for (int g2 = 0; g2< MAX_GRID; g2++) {
+            for (int g3 = 0; g3 < MAX_GRID; g3++) {
+                drawCrosshair(
+                              g1*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              g2*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              g3*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              15);
+                ofLog() << "GP:" << g1 << " "<< g2 << " "<< g3;
+            }
+        }
+        
+    }
 }
 
 //--------------------------------------------------------------

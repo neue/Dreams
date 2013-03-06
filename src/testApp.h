@@ -5,6 +5,8 @@
 
 #define NUM_PTS 10000
 #define FOG_DIST 2000
+#define MAX_GRID 4
+#define GRID_SPACING 300
 
 class testApp : public ofBaseApp{
 
@@ -19,6 +21,7 @@ class testApp : public ofBaseApp{
     
         void drawZeroPoint();
         void drawCrosshair(float x,float y,float z,float size);
+        void drawGrid(float x,float y,float z);
     
         float measure(float x1,float y1,float x2,float y2);
     
@@ -68,9 +71,16 @@ class testApp : public ofBaseApp{
     
         int sketchBrightness;
     
-        float offsetX;
-        float offsetY;
-        float offsetZ;
+    float offsetX;
+    float offsetY;
+    float offsetZ;
+    
+    float angle;
+    float rotateX;
+    float rotateY;
+    float rotateZ;
+    
+    
     
     float timeCode;
 
