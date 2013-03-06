@@ -4,6 +4,7 @@
 #include "ofxXmlSettings.h"
 
 #define NUM_PTS 10000
+#define FOG_DIST 1000
 
 class testApp : public ofBaseApp{
 
@@ -12,8 +13,11 @@ class testApp : public ofBaseApp{
 		void setup();
 		void update();
         void draw();
-        void loadSketch(ofxXmlSettings sketchXML);
+        void loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY, float anchorZ);
 		
+        void drawZeroPoint();
+        float measure(float x1,float y1,float x2,float y2);
+    
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -55,6 +59,10 @@ class testApp : public ofBaseApp{
 		int pointCount;
 		int lineCount;
 		int lastTagNumber;
+    
+        int visibleSketch;
+    
+        int sketchBrightness;
     
         float offsetX;
         float offsetY;
