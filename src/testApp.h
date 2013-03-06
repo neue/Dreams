@@ -11,7 +11,8 @@ class testApp : public ofBaseApp{
 
 		void setup();
 		void update();
-		void draw();
+        void draw();
+        void loadSketch(ofxXmlSettings sketchXML);
 		
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -44,8 +45,12 @@ class testApp : public ofBaseApp{
             vector<rhonPoint> rhonPoints;
         };
 
+        struct rhonSketch {
+            vector<rhonLine*> rhonLines;
+            ofPoint pos;
+        };
     
-        vector<rhonLine*> rhonLines;
+        vector<rhonSketch*> rhonSketches;
 
 		int pointCount;
 		int lineCount;
@@ -54,6 +59,9 @@ class testApp : public ofBaseApp{
         float offsetX;
         float offsetY;
         float offsetZ;
+    
+    float timeCode;
+
     
     ofEasyCam cam; // add mouse controls for camera movement
 
