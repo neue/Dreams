@@ -82,7 +82,7 @@ class testApp : public ofBaseApp{
     ofFbo screenFbo;
     ofShader chrom_abb;
 
-    
+    int gridBrightness;
     
     float timeCode;
 

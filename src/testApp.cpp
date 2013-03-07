@@ -1,7 +1,7 @@
 #include "testApp.h"
 
-#define WIDTH 1024
-#define HEIGHT 768
+#define WIDTH 800
+#define HEIGHT 600
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -21,8 +21,8 @@ void testApp::setup(){
 	//if it doesn't exist we can still make one
 	//by hitting the 's' key
 	if( XML.loadFile("sketch2.xml") )  {loadSketch(XML,-1040,-600,-120);}
-	if( XML.loadFile("sketch.xml") )   {loadSketch(XML,-1040,-600,-120);}
-	if( XML.loadFile("cat.xml") )      {loadSketch(XML,-1040,-600,-120);}
+	if( XML.loadFile("x47b.xml") )   {loadSketch(XML,-580,-320,60);}
+	if( XML.loadFile("cray.xml") )      {loadSketch(XML,-880,-560,540);}
 	if( XML.loadFile("spongebob.xml") ){loadSketch(XML,-1040,-300,-120);}
 
 	//we initalize some of our variables
@@ -56,7 +56,7 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
             sketchXML.pushTag("line", i);
             int numPtTags = sketchXML.getNumTags("pt");
             if(numPtTags > 0){
-                ofLog() << " Numpointtags:" << numPtTags;
+                //ofLog() << " Points:" << numPtTags;
                 
                 int totalToRead = MIN(numPtTags, NUM_PTS);
                 
@@ -72,7 +72,7 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
             sketchXML.popTag();
             newRhonSketch->rhonLines.push_back(newRhonLine);
         }
-        ofLog() << "Lines:" << newRhonSketch->rhonLines.size();
+        //ofLog() << "Lines:" << newRhonSketch->rhonLines.size();
 	}
     newRhonSketch->pos.set(anchorX,anchorY,anchorZ);
     rhonSketches.push_back(newRhonSketch);
@@ -151,39 +151,33 @@ void testApp::draw(){
     glPopMatrix();
     
     //drawZeroPoint();
+    drawGrid(150, 150, -430);
     
     
-    
-    drawCrosshair(-300,-300,0,30);
-    drawCrosshair(-300,-300,-500,30);
-    drawCrosshair(300,-300,-500,30);
-    drawCrosshair(300,-300,0,30);
-    
-    drawCrosshair(-300,300,0,30);
-    drawCrosshair(-300,300,-500,30);
-    drawCrosshair(300,300,-500,30);
-    drawCrosshair(300,300,0,30);
+//    drawCrosshair(-300,-300,0,30);
+//    drawCrosshair(-300,-300,-500,30);
+//    drawCrosshair(300,-300,-500,30);
+//    drawCrosshair(300,-300,0,30);
+//    
+//    drawCrosshair(-300,300,0,30);
+//    drawCrosshair(-300,300,-500,30);
+//    drawCrosshair(300,300,-500,30);
+//    drawCrosshair(300,300,0,30);
 
     
     ofFill();
     cam.end();
 
-	ofSetColor(0, 255, 0, 200);
-    //TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 12);
+	ofSetColor(130, 130, 130);
+    TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 50);
     screenFbo.end();
     chrom_abb.begin();
-    // Pass Fbo of screen to shader
-    chrom_abb.setUniformTexture("baseTex", screenFbo.getTextureReference(), 0);
-    // Give the shader a random x and y offset from -10 to 10
-    chrom_abb.setUniform2f("uAberrationOffset", -2, 0);
-    // Draw a quad using OpenGL
-    // This is where the result of the shader is outputted
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0);     glVertex2f(0, 0);
-    glTexCoord2f(WIDTH, 0);     glVertex2f(WIDTH, 0);
-    glTexCoord2f(WIDTH, HEIGHT);    glVertex2f(WIDTH, HEIGHT);
-    glTexCoord2f(0, HEIGHT);    glVertex2f(0, HEIGHT);
-    glEnd();
+        // Pass Fbo of screen to shader
+        chrom_abb.setUniformTexture("baseTex", screenFbo.getTextureReference(), 0);
+        // Give the shader a random x and y offset from -10 to 10
+        chrom_abb.setUniform2f("uAberrationOffset", -1, 0);
+    screenFbo.draw(0, 0);
+
     chrom_abb.end();
 
 
@@ -208,7 +202,6 @@ void testApp::drawZeroPoint(){
 
 //--------------------------------------------------------------
 void testApp::drawCrosshair(float x, float y, float z,float size){
-    ofSetColor(255,255,255);
     ofBeginShape();
     ofVertex((size*-1)+x,0+y,0+z);
     ofVertex(size+x,0+y,0+z);
@@ -224,15 +217,20 @@ void testApp::drawCrosshair(float x, float y, float z,float size){
 }
 //--------------------------------------------------------------
 void testApp::drawGrid(float x, float y, float z){
+    gridBrightness = 0;
     for (int g1 = 0; g1 < MAX_GRID; g1++) {
+        gridBrightness += 50;
+
         for (int g2 = 0; g2< MAX_GRID; g2++) {
+
             for (int g3 = 0; g3 < MAX_GRID; g3++) {
+
+                ofSetColor(gridBrightness,gridBrightness,gridBrightness);
                 drawCrosshair(
-                              g1*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
-                              g2*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
-                              g3*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              x+g3*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              y+g2*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              z+g1*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
                               15);
-                ofLog() << "GP:" << g1 << " "<< g2 << " "<< g3;
             }
         }
         
@@ -253,7 +251,6 @@ float testApp::measure(float x1,float y1,float x2,float y2){
 //--------------------------------------------------------------
 
 void testApp::corrupt(int sketchToCorrupt){
-    ofLog() << "Corrupting";
         for(int i2 = 0; i2 < rhonSketches[sketchToCorrupt]->rhonLines.size();i2++){
             for(int i3=0;i3 < rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints.size();i3++){
                 if (ofRandom(0,300) < 2) {
