@@ -8,9 +8,9 @@ void testApp::setup(){
 	ofBackground(0,0,0);
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
-    screenFbo.allocate(WIDTH, HEIGHT);
+    screenFbo.allocate(WIDTH, HEIGHT,GL_RGBA);
     // looks in /bin/data
-    chrom_abb.load("shaders/chrom_abb.vert", "shaders/chrom_abb.frag");
+    //chrom_abb.load("shaders/chrom_abb.vert", "shaders/chrom_abb.frag");
 
 	//-----------
 	//the string is printed at the top of the app
@@ -77,6 +77,8 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
     newRhonSketch->pos.set(anchorX,anchorY,anchorZ);
     rhonSketches.push_back(newRhonSketch);
     offsetZ = 500;
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -171,14 +173,36 @@ void testApp::draw(){
 	ofSetColor(130, 130, 130);
     TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 50);
     screenFbo.end();
-    chrom_abb.begin();
-        // Pass Fbo of screen to shader
-        chrom_abb.setUniformTexture("baseTex", screenFbo.getTextureReference(), 0);
-        // Give the shader a random x and y offset from -10 to 10
-        chrom_abb.setUniform2f("uAberrationOffset", -1, 0);
+    
+//    chrom_abb.begin();
+//        // Pass Fbo of screen to shader
+//        chrom_abb.setUniformTexture("baseTex", screenFbo.getTextureReference(), 0);
+//        // Give the shader a random x and y offset from -10 to 10
+//        chrom_abb.setUniform2f("uAberrationOffset", -1, 0);
+//    screenFbo.draw(0, 0);
+//
+//    chrom_abb.end();
+    
+    if (ofRandom(1,400) < 10) {
+        abrrasionX = ofRandom(2,10);
+    } else {
+        abrrasionX = 1;
+    }
+    if (ofRandom(1,4000) < 10) {
+        abrrasionY = ofRandom(2,10);
+    } else {
+        abrrasionY = 0;
+    }
+    
+    
+    ofEnableAlphaBlending();
+    ofEnableBlendMode(OF_BLENDMODE_ADD);
+    ofSetColor(255, 0, 0);
+    screenFbo.draw(abrrasionX*-1, abrrasionY*-1);
+    ofSetColor(0, 255, 0);
     screenFbo.draw(0, 0);
-
-    chrom_abb.end();
+    ofSetColor(0, 0, 255);
+    screenFbo.draw(abrrasionX, abrrasionY);
 
 
 }

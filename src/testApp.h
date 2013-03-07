@@ -80,12 +80,15 @@ class testApp : public ofBaseApp{
     float rotateY;
     float rotateZ;
     ofFbo screenFbo;
+
     ofShader chrom_abb;
 
     int gridBrightness;
     
     float timeCode;
 
+    int abrrasionX;
+    int abrrasionY;
     
     ofEasyCam cam; // add mouse controls for camera movement
 
