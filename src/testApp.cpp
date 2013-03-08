@@ -77,7 +77,7 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
     newRhonSketch->pos.set(anchorX,anchorY,anchorZ);
     rhonSketches.push_back(newRhonSketch);
     offsetZ = 500;
-    
+    corruptionAmplitude = 0.5;
     
 }
 
@@ -153,7 +153,7 @@ void testApp::draw(){
     glPopMatrix();
     
     //drawZeroPoint();
-    drawGrid(150, 150, -430);
+    drawGrid(150, 112, -430);
     
     
 //    drawCrosshair(-300,-300,0,30);
@@ -183,26 +183,26 @@ void testApp::draw(){
 //
 //    chrom_abb.end();
     
-    if (ofRandom(1,400) < 10) {
-        abrrasionX = ofRandom(2,10);
-    } else {
-        abrrasionX = 1;
-    }
     if (ofRandom(1,4000) < 10) {
-        abrrasionY = ofRandom(2,10);
+        aberrationX = ofRandom(2,10);
     } else {
-        abrrasionY = 0;
+        aberrationX = 1;
+    }
+    if (ofRandom(1,8000) < 10) {
+        aberrationY = ofRandom(2,10);
+    } else {
+        aberrationY = 0;
     }
     
     
     ofEnableAlphaBlending();
     ofEnableBlendMode(OF_BLENDMODE_ADD);
     ofSetColor(255, 0, 0);
-    screenFbo.draw(abrrasionX*-1, abrrasionY*-1);
+    screenFbo.draw(aberrationX*-1, aberrationY*-1);
     ofSetColor(0, 255, 0);
     screenFbo.draw(0, 0);
     ofSetColor(0, 0, 255);
-    screenFbo.draw(abrrasionX, abrrasionY);
+    screenFbo.draw(aberrationX, aberrationY);
 
 
 }
@@ -251,9 +251,9 @@ void testApp::drawGrid(float x, float y, float z){
 
                 ofSetColor(gridBrightness,gridBrightness,gridBrightness);
                 drawCrosshair(
-                              x+g3*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
-                              y+g2*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
-                              z+g1*GRID_SPACING-(GRID_SPACING*MAX_GRID/2),
+                              x+g3*GRID_SPACINGX-(GRID_SPACINGX*MAX_GRID/2),
+                              y+g2*GRID_SPACINGY-(GRID_SPACINGY*MAX_GRID/2),
+                              z+g1*GRID_SPACINGX-(GRID_SPACINGX*MAX_GRID/2),
                               15);
             }
         }
@@ -266,33 +266,63 @@ void testApp::drawGrid(float x, float y, float z){
 float testApp::measure(float x1,float y1,float x2,float y2){
     float dx = x1 - x2;
     float dy = y1 - y2;
-    
-    
-    
     return (((sqrt( dx * dx + dy * dy ))-0)/(FOG_DIST-0) * (0+255) - 255)* -1;
 }
 
 //--------------------------------------------------------------
 
 void testApp::corrupt(int sketchToCorrupt){
-        for(int i2 = 0; i2 < rhonSketches[sketchToCorrupt]->rhonLines.size();i2++){
-            for(int i3=0;i3 < rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints.size();i3++){
-                if (ofRandom(0,300) < 2) {
-                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofRandom(-6,6);
-                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofRandom(-6,6);
-                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofRandom(-6,6);
-                }
-                if (ofRandom(0,6000) < 2) {
-                    ofLog() << "BIG ONE";
-
-                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofRandom(-60,60);
-                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofRandom(-60,60);
-                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofRandom(-60,60);
-                }
-            }
-        }
+//        for(int i2 = 0; i2 < rhonSketches[sketchToCorrupt]->rhonLines.size();i2++){
+//            for(int i3=0;i3 < rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints.size();i3++){
+//                if (ofRandom(0,300) < 2) {
+//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofRandom(-6,6);
+//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofRandom(-6,6);
+//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofRandom(-6,6);
+//                }
+//                if (ofRandom(0,6000) < 2) {
+//                    ofLog() << "BIG ONE";
+//
+//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofRandom(-60,60);
+//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofRandom(-60,60);
+//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofRandom(-60,60);
+//                }
+//            }
+//        }
             
+    float liquidness = 2;
+	float speedDampen = 5;
+    
+    for(int i2 = 0; i2 < rhonSketches[sketchToCorrupt]->rhonLines.size();i2++){
+        if (ofRandom(0,1000) < 2) {
+            corruptionBurnoff = corruptionAmplitude;
+            ofLog() << "corruptionBurnoff:"<< corruptionBurnoff;
 
+            for(int i3=0;i3 < rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints.size();i3++){
+
+                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofSignedNoise(rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x/liquidness, rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y/liquidness,rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z/liquidness, ofGetElapsedTimef()/speedDampen)*corruptionBurnoff;
+                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofSignedNoise(rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z/liquidness, rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x/liquidness,rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y/liquidness, ofGetElapsedTimef()/speedDampen)*corruptionBurnoff;
+                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofSignedNoise(rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y/liquidness, rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z/liquidness,rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x/liquidness, ofGetElapsedTimef()/speedDampen)*corruptionBurnoff;
+                if(corruptionBurnoff > 0.01){
+                    corruptionBurnoff = corruptionBurnoff * 0.95;
+                } else if(corruptionBurnoff < 0.01) {
+                    corruptionBurnoff = 0.0;
+                }
+                
+            }
+            corruptionAmplitude += 1.0;
+
+        }
+    }
+
+    
+//	for(int i = 0; i < verts.size(); i++){
+//		verts[i].x += 
+//		verts[i].y += ofSignedNoise(verts[i].z/liquidness, verts[i].x/liquidness,verts[i].y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+//		verts[i].z += ofSignedNoise(verts[i].y/liquidness, verts[i].z/liquidness,verts[i].x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
+//	}
+
+    
+    
 }
 
 //--------------------------------------------------------------

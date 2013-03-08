@@ -6,7 +6,8 @@
 #define NUM_PTS 10000
 #define FOG_DIST 2000
 #define MAX_GRID 4
-#define GRID_SPACING 300
+#define GRID_SPACINGX 300
+#define GRID_SPACINGY 225
 
 class testApp : public ofBaseApp{
 
@@ -87,8 +88,11 @@ class testApp : public ofBaseApp{
     
     float timeCode;
 
-    int abrrasionX;
-    int abrrasionY;
+    int aberrationX;
+    int aberrationY;
+    
+    float corruptionAmplitude;
+    float corruptionBurnoff;
     
     ofEasyCam cam; // add mouse controls for camera movement
 
