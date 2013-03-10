@@ -1,11 +1,12 @@
 #include "testApp.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 720
+#define HEIGHT 480
 
 //--------------------------------------------------------------
 void testApp::setup(){
 	ofBackground(0,0,0);
+    ofHideCursor();
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
     screenFbo.allocate(WIDTH, HEIGHT,GL_RGBA);
@@ -20,10 +21,10 @@ void testApp::setup(){
 	//we load our settings file
 	//if it doesn't exist we can still make one
 	//by hitting the 's' key
-	if( XML.loadFile("sketch2.xml") )  {loadSketch(XML,-1040,-600,-120);}
+	if( XML.loadFile("Predator.xml") )  {loadSketch(XML,-580,-340,-40);}
 	if( XML.loadFile("x47b.xml") )   {loadSketch(XML,-580,-320,60);}
 	if( XML.loadFile("cray.xml") )      {loadSketch(XML,-880,-560,540);}
-	if( XML.loadFile("spongebob.xml") ){loadSketch(XML,-1040,-300,-120);}
+	if( XML.loadFile("BigDog.xml") ){loadSketch(XML,-540,-280,-80);}
 
 	//we initalize some of our variables
 	lastTagNumber	= 0;
@@ -37,11 +38,13 @@ void testApp::setup(){
     rotateX = 0.0;
     rotateY = 0.0;
     rotateZ = 0.0;
+    gridDistort = 0.0;
     
 
 	TTF.loadFont("mono.ttf", 7);
     
     visibleSketch = 0;
+    ofLog() << "Screen Width:" << ofGetScreenWidth() << "Screen Height:" << ofGetScreenHeight();
 }
 
 //--------------------------------------------------------------
@@ -78,17 +81,17 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
     rhonSketches.push_back(newRhonSketch);
     offsetZ = 500;
     corruptionAmplitude = 0.5;
-    
+    corruptionTimer = 200.0;
+    corruptionCount = 0;
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
     //timeCode += 0.01;
     timeCode = ofGetLastFrameTime();
-    offsetZ +=  timeCode * 200;
+    offsetZ +=  timeCode * 100;
     if(offsetZ > 2000){
         offsetZ = -2500;
-        corrupt(visibleSketch);
         visibleSketch = (visibleSketch+1)%rhonSketches.size();
         ofLog() << "Sketch:" << visibleSketch;
     }
@@ -98,7 +101,12 @@ void testApp::update(){
     rotateX +=  timeCode * 100;
     rotateY +=  timeCode * -80;
     rotateZ +=  timeCode * 89;
-
+    
+    corruptionTimer -= 0.1;
+    if(corruptionTimer < 0){
+        corrupt(visibleSketch);
+        corruptionTimer = ofRandom(30.0,200.0);
+    }
     
 }
 
@@ -155,18 +163,6 @@ void testApp::draw(){
     //drawZeroPoint();
     drawGrid(150, 112, -430);
     
-    
-//    drawCrosshair(-300,-300,0,30);
-//    drawCrosshair(-300,-300,-500,30);
-//    drawCrosshair(300,-300,-500,30);
-//    drawCrosshair(300,-300,0,30);
-//    
-//    drawCrosshair(-300,300,0,30);
-//    drawCrosshair(-300,300,-500,30);
-//    drawCrosshair(300,300,-500,30);
-//    drawCrosshair(300,300,0,30);
-
-    
     ofFill();
     cam.end();
 
@@ -174,26 +170,11 @@ void testApp::draw(){
     TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 50);
     screenFbo.end();
     
-//    chrom_abb.begin();
-//        // Pass Fbo of screen to shader
-//        chrom_abb.setUniformTexture("baseTex", screenFbo.getTextureReference(), 0);
-//        // Give the shader a random x and y offset from -10 to 10
-//        chrom_abb.setUniform2f("uAberrationOffset", -1, 0);
-//    screenFbo.draw(0, 0);
-//
-//    chrom_abb.end();
-    
     if (ofRandom(1,4000) < 10) {
         aberrationX = ofRandom(2,10);
     } else {
         aberrationX = 1;
-    }
-    if (ofRandom(1,8000) < 10) {
-        aberrationY = ofRandom(2,10);
-    } else {
-        aberrationY = 0;
-    }
-    
+    }    
     
     ofEnableAlphaBlending();
     ofEnableBlendMode(OF_BLENDMODE_ADD);
@@ -251,13 +232,18 @@ void testApp::drawGrid(float x, float y, float z){
 
                 ofSetColor(gridBrightness,gridBrightness,gridBrightness);
                 drawCrosshair(
-                              x+g3*GRID_SPACINGX-(GRID_SPACINGX*MAX_GRID/2),
-                              y+g2*GRID_SPACINGY-(GRID_SPACINGY*MAX_GRID/2),
-                              z+g1*GRID_SPACINGX-(GRID_SPACINGX*MAX_GRID/2),
+                              x+g3*GRID_SPACINGX-(GRID_SPACINGX*MAX_GRID/2)+ofRandom(gridDistort*-1,gridDistort),
+                              y+g2*GRID_SPACINGY-(GRID_SPACINGY*MAX_GRID/2)+ofRandom(gridDistort*-1,gridDistort),
+                              z+g1*GRID_SPACINGX-(GRID_SPACINGX*MAX_GRID/2)+ofRandom(gridDistort*-1,gridDistort),
                               15);
             }
         }
         
+    }
+    if(gridDistort > 0.0) {
+        gridDistort -= 0.2;
+    } else {
+        gridDistort = 0.0;
     }
 }
 
@@ -272,28 +258,15 @@ float testApp::measure(float x1,float y1,float x2,float y2){
 //--------------------------------------------------------------
 
 void testApp::corrupt(int sketchToCorrupt){
-//        for(int i2 = 0; i2 < rhonSketches[sketchToCorrupt]->rhonLines.size();i2++){
-//            for(int i3=0;i3 < rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints.size();i3++){
-//                if (ofRandom(0,300) < 2) {
-//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofRandom(-6,6);
-//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofRandom(-6,6);
-//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofRandom(-6,6);
-//                }
-//                if (ofRandom(0,6000) < 2) {
-//                    ofLog() << "BIG ONE";
-//
-//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.x += ofRandom(-60,60);
-//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.y += ofRandom(-60,60);
-//                    rhonSketches[sketchToCorrupt]->rhonLines[i2]->rhonPoints[i3].pnt.z += ofRandom(-60,60);
-//                }
-//            }
-//        }
-            
+
+    corruptionCount++;
+    ofLog() << "Corruptions:" << corruptionCount;
+    
     float liquidness = 2;
 	float speedDampen = 5;
-    
+    gridDistort = 10;
     for(int i2 = 0; i2 < rhonSketches[sketchToCorrupt]->rhonLines.size();i2++){
-        if (ofRandom(0,1000) < 2) {
+        if (ofRandom(0,500) < 2) {
             corruptionBurnoff = corruptionAmplitude;
             ofLog() << "corruptionBurnoff:"<< corruptionBurnoff;
 

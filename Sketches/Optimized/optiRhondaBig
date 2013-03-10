@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby -w
+require "rubygems"
+require 'rexml/document'
+
+ARGV.each do|a|
+  @filepath = a
+end
+
+
+newName = @filepath.split('/')[1].split('.')[0]
+outFile = File.new(newName+"OPTIMISED.xml", 'w')
+
+doc = REXML::Document.new("<root>"+File.read(@filepath)+"</root>")
+res = doc.elements.to_a("/*/*").map{|e1|
+e1.elements.to_a.map{|e2|e2.elements.to_a.map{|e3|e3.text}}
+}
+
+prevRoundedX = 0
+res.each_with_index do |res1,i|
+  before = res[i].length
+  res[i].each_with_index do |res2,i2|
+      x1 = res[i][i2][0].to_i
+      y1 = res[i][i2][1].to_i
+      z1 = res[i][i2][2].to_i
+      x2 = res[i][i2-1][0].to_i
+      y2 = res[i][i2-1][1].to_i
+      z2 = res[i][i2-1][2].to_i
+      xd = x2-x1
+      yd = y2-y1
+      zd = z2-z1
+      distance = Math.sqrt(xd*xd + yd*yd + zd*zd)     
+      if distance < 4
+        res[i].delete_at(i2)
+      end               
+    end        
+    
+    # if roundedX == prevRoundedX
+    #   res[i].delete_at(i2)
+    # end
+    
+  puts "Line #{i} Before:#{before} After:#{res[i].length}"
+  end
+
+res.each_with_index do |res1,i|
+  outFile << "<line>\n"
+  res[i].each_with_index do |res2,i2|
+    outFile << "<pt>\n"
+      outFile << "<x>#{res[i][i2][0]}</x>\n"
+      outFile << "<y>#{res[i][i2][1]}</y>\n"
+      outFile << "<z>#{res[i][i2][2]}</z>\n"
+      outFile << "</pt>\n"
+  end
+  outFile << "</line>\n"
+end
+
+outFile.close
+      

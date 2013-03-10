@@ -85,6 +85,7 @@ class testApp : public ofBaseApp{
     ofShader chrom_abb;
 
     int gridBrightness;
+    float gridDistort;
     
     float timeCode;
 
@@ -93,6 +94,8 @@ class testApp : public ofBaseApp{
     
     float corruptionAmplitude;
     float corruptionBurnoff;
+    float corruptionTimer;
+    int corruptionCount;
     
     ofEasyCam cam; // add mouse controls for camera movement
 
