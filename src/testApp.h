@@ -6,8 +6,8 @@
 #define NUM_PTS 10000
 #define FOG_DIST 2000
 #define MAX_GRID 4
-#define GRID_SPACINGX 300
-#define GRID_SPACINGY 225
+#define GRID_SPACINGX 280
+#define GRID_SPACINGY 186
 
 class testApp : public ofBaseApp{
 

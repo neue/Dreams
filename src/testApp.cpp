@@ -24,7 +24,9 @@ void testApp::setup(){
 	if( XML.loadFile("Predator.xml") )  {loadSketch(XML,-580,-340,-40);}
 	if( XML.loadFile("x47b.xml") )   {loadSketch(XML,-580,-320,60);}
 	if( XML.loadFile("cray.xml") )      {loadSketch(XML,-880,-560,540);}
-	if( XML.loadFile("BigDog.xml") ){loadSketch(XML,-540,-280,-80);}
+	if( XML.loadFile("BigDog.xml") ) {loadSketch(XML,-540,-280,-80);}
+    if( XML.loadFile("Kennan.xml") )  {loadSketch(XML,-240,-500,260);}
+
 
 	//we initalize some of our variables
 	lastTagNumber	= 0;
@@ -45,6 +47,12 @@ void testApp::setup(){
     
     visibleSketch = 0;
     ofLog() << "Screen Width:" << ofGetScreenWidth() << "Screen Height:" << ofGetScreenHeight();
+    
+    offsetZ = 500;
+    corruptionAmplitude = 0.5;
+    corruptionTimer = 200.0;
+    corruptionCount = 0;
+
 }
 
 //--------------------------------------------------------------
@@ -79,10 +87,6 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
 	}
     newRhonSketch->pos.set(anchorX,anchorY,anchorZ);
     rhonSketches.push_back(newRhonSketch);
-    offsetZ = 500;
-    corruptionAmplitude = 0.5;
-    corruptionTimer = 200.0;
-    corruptionCount = 0;
 }
 
 //--------------------------------------------------------------
@@ -161,13 +165,13 @@ void testApp::draw(){
     glPopMatrix();
     
     //drawZeroPoint();
-    drawGrid(150, 112, -430);
+    drawGrid(140, 93, -430);
     
     ofFill();
     cam.end();
 
-	ofSetColor(130, 130, 130);
-    TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 50);
+	//ofSetColor(130, 93, 130);
+    //TTF.drawString("FPS: "+ofToString(ofGetFrameRate()), 170, 50);
     screenFbo.end();
     
     if (ofRandom(1,4000) < 10) {
