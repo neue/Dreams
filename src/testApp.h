@@ -82,8 +82,6 @@ class testApp : public ofBaseApp{
     float rotateZ;
     ofFbo screenFbo;
 
-    ofShader chrom_abb;
-
     int gridBrightness;
     float gridDistort;
     

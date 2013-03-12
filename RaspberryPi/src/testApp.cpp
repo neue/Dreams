@@ -10,25 +10,14 @@ void testApp::setup(){
     ofSetFrameRate(60);
     ofSetVerticalSync(true);
     screenFbo.allocate(WIDTH, HEIGHT,GL_RGBA);
-    // looks in /bin/data
-    //chrom_abb.load("shaders/chrom_abb.vert", "shaders/chrom_abb.frag");
-
-	//-----------
-	//the string is printed at the top of the app
-	//to give the user some feedback
 	message = "loading sketch.xml";
 
-	//we load our settings file
-	//if it doesn't exist we can still make one
-	//by hitting the 's' key
 	if( XML.loadFile("Predator.xml") )  {loadSketch(XML,-580,-340,-40);}
 	if( XML.loadFile("x47b.xml") )   {loadSketch(XML,-580,-320,60);}
 	if( XML.loadFile("cray.xml") )      {loadSketch(XML,-880,-560,540);}
 	if( XML.loadFile("BigDog.xml") ) {loadSketch(XML,-540,-280,-80);}
     if( XML.loadFile("Kennan.xml") )  {loadSketch(XML,-240,-500,260);}
 
-
-	//we initalize some of our variables
 	lastTagNumber	= 0;
 	pointCount		= 0;
 	lineCount		= 0;
@@ -91,7 +80,6 @@ void testApp::loadSketch(ofxXmlSettings sketchXML, float anchorX, float anchorY,
 
 //--------------------------------------------------------------
 void testApp::update(){
-    //timeCode += 0.01;
     timeCode = ofGetLastFrameTime();
     offsetZ +=  timeCode * 100;
     if(offsetZ > 2000){
@@ -99,7 +87,6 @@ void testApp::update(){
         visibleSketch = (visibleSketch+1)%rhonSketches.size();
         ofLog() << "Sketch:" << visibleSketch;
     }
-    //ofLog() << "Z:" << offsetZ;
     
     angle   +=  timeCode * 70;
     rotateX +=  timeCode * 100;
@@ -121,21 +108,10 @@ void testApp::draw(){
 
 	cam.begin();
 
-	//---------
-	//Lets draw the stroke as a continous line
-
     sketchBrightness = measure(-200,0,offsetZ,offsetY);
     
 	ofSetColor(sketchBrightness,sketchBrightness,sketchBrightness);
 	ofNoFill();
-//	ofBeginShape();
-//	for(int i = 0; i < pointCount; i++){
-//		ofVertex(dragPts[i].x+offsetX+ofRandom(-0.2,0.2),
-//                 dragPts[i].y+offsetY+ofRandom(-0.2,0.2),
-//                 dragPts[i].z+offsetZ+ofRandom(-0.2,0.2)
-//                 );
-//	}
-//    ofEndShape(false);
     glPushMatrix();
 
     glTranslatef(offsetX, offsetY, offsetZ);
@@ -290,15 +266,6 @@ void testApp::corrupt(int sketchToCorrupt){
 
         }
     }
-
-    
-//	for(int i = 0; i < verts.size(); i++){
-//		verts[i].x += 
-//		verts[i].y += ofSignedNoise(verts[i].z/liquidness, verts[i].x/liquidness,verts[i].y/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-//		verts[i].z += ofSignedNoise(verts[i].y/liquidness, verts[i].z/liquidness,verts[i].x/liquidness, ofGetElapsedTimef()/speedDampen)*amplitude;
-//	}
-
-    
     
 }
 
