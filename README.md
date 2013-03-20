@@ -3,7 +3,9 @@
 
 ![Connection Machine](http://www.cs.umd.edu/projects/plus/Parka/CM5.gif)
 
-A supercomputer dreams of it's past colleagues while it's memory is securely deleted.
+A supercomputer that has recently gained sentience dreams of its past colleges while being securely erased with random data.
+
+[/DEV/NULL/DREAMS Video](https://vimeo.com/62247340)
 
     /Sketches/
 
