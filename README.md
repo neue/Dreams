@@ -3,7 +3,7 @@
 
 ![Connection Machine](http://www.cs.umd.edu/projects/plus/Parka/CM5.gif)
 
-A supercomputer that has recently gained sentience dreams of its past colleges while being securely erased with random data.
+A supercomputer that has recently gained sentience dreams of its past colleagues while being securely erased with random data.
 
 [/DEV/NULL/DREAMS Video](https://vimeo.com/62247340)
 
@@ -21,7 +21,7 @@ Sketches in DXF format for use in Cinema4D etc
 
     /DreamsPi/
 
-This version will build on RaspberryPi, you'll need to compile it on there too after following the [setup instructions](https://github.com/openFrameworks-RaspberryPi/openFrameworks/wiki/RaspberryPi) then it should build when moved to the devApps folder
+This version will build on RaspberryPi, you'll need to compile it on the Pi after following the [setup instructions](https://github.com/openFrameworks-RaspberryPi/openFrameworks/wiki/RaspberryPi) then it should build when moved to the devApps folder
 
 ![Big Dog](http://24.media.tumblr.com/a719e26c72815d546c0694f483dea942/tumblr_mjk2ta2nTu1qa15eoo1_500.gif)
 
